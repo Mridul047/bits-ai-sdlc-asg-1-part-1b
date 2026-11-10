@@ -1,0 +1,42 @@
+.idea/
+.claude/
+
+# Machine-local Spec Kit state — not meant to be shared.
+# Managed by the Specify CLI; safe to edit (your changes are preserved on refresh).
+
+# Local pointer to the current feature directory. Rewritten every time you
+# switch features, so it is per-checkout state rather than something to share.
+.specify/feature.json
+
+# Per-machine extension config overrides.
+.specify/extensions/*/local-config.yml
+
+# Executable adapter packages and their per-checkout provenance registry.
+# Execution consent is stored separately in the user's local trust registry.
+.specify/integrations/packages/
+.specify/integrations/packages.json
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# temp files
+*.tmp
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Environment / Secrets
+.env
+.env.*
