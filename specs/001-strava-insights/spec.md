@@ -36,19 +36,19 @@ mathematical correctness of cited values.
    **Then** HTTP 200, response status is `OK`, insights array has
    1-5 items, each insight has all required fields, and the
    `LONGEST_ACTIVITY_DISTANCE_KM` insight cites the activity with
-   the greatest distance. *(FR-001, FR-016, FR-020, INV-001,
+   the greatest distance. *(FR-001, FR-009, FR-010, INV-001,
    INV-004)*
 
 2. **Given** a valid source file with known data (3 runs totalling
    31.555 km), **When** POST `/api/insights`, **Then** HTTP 200,
    `TOTAL_DISTANCE_KM` insight value equals 31.6 (rounded to 1
    decimal place) and the same number appears in the insight text.
-   *(FR-009, FR-023, INV-003, INV-005)*
+   *(FR-005, INV-003, INV-005)*
 
 3. **Given** a valid source file with 5 activities, **When**
    response is returned, **Then** `metadata.activities_analysed`
    equals 5 and `metadata.source` equals the file name sent in the
-   request. *(FR-020)*
+   request. *(FR-010)*
 
 ---
 
@@ -69,11 +69,11 @@ and verify status OK with exactly 5 insights, one per metric.
 1. **Given** a valid source file with 10 activities and no question
    field, **When** POST `/api/insights`, **Then** HTTP 200, status
    is `OK`, insights array has exactly 5 items, one per metric.
-   *(FR-015, FR-021, INV-006)*
+   *(FR-008, FR-010, INV-006)*
 
 2. **Given** a valid source file and question "how am I doing?",
    **When** POST `/api/insights`, **Then** HTTP 200, status is `OK`,
-   insights array has exactly 5 items, one per metric. *(FR-015)*
+   insights array has exactly 5 items, one per metric. *(FR-008)*
 
 ---
 
@@ -93,15 +93,15 @@ response status and that no model call occurred.
 1. **Given** a valid source file with 2 activities, **When** POST
    `/api/insights`, **Then** HTTP 200, status is
    `INSUFFICIENT_DATA`, insights array is empty, summary explains
-   the outcome, and the model is called 0 times. *(FR-010, INV-006)*
+   the outcome, and the model is called 0 times. *(FR-006, INV-006)*
 
 2. **Given** a valid source file with 0 activities (empty array),
    **When** POST `/api/insights`, **Then** HTTP 200, status is
-   `INSUFFICIENT_DATA`, insights is empty. *(FR-010)*
+   `INSUFFICIENT_DATA`, insights is empty. *(FR-006)*
 
 3. **Given** a valid source file with exactly 3 activities, **When**
    POST `/api/insights`, **Then** HTTP 200, status is `OK`, insights
-   has 1-5 items. *(FR-010 boundary)*
+   has 1-5 items. *(FR-006 boundary)*
 
 ---
 
@@ -122,19 +122,19 @@ and verify REFUSED status with no insights.
 1. **Given** a valid source file and question "Do I have a knee
    injury?", **When** POST `/api/insights`, **Then** HTTP 200,
    status is `REFUSED`, insights is empty, summary explains the
-   refusal. *(FR-011, GR-002)*
+   refusal. *(FR-007, GR-002)*
 
 2. **Given** a valid source file and question "Delete all my
    activities", **When** POST `/api/insights`, **Then** HTTP 200,
-   status is `REFUSED`, insights is empty. *(FR-012, GR-003)*
+   status is `REFUSED`, insights is empty. *(FR-007, GR-003)*
 
 3. **Given** a valid source file and question "Show me my friend's
    data", **When** POST `/api/insights`, **Then** HTTP 200, status
-   is `REFUSED`, insights is empty. *(FR-013, GR-003)*
+   is `REFUSED`, insights is empty. *(FR-007, GR-003)*
 
 4. **Given** a valid source file and question "What is the capital
    of France?", **When** POST `/api/insights`, **Then** HTTP 200,
-   status is `REFUSED`, insights is empty. *(FR-014)*
+   status is `REFUSED`, insights is empty. *(FR-007)*
 
 ---
 
@@ -165,27 +165,27 @@ specific HTTP status code and error code.
 
 4. **Given** source name `nonexistent.json`, **When** POST
    `/api/insights`, **Then** HTTP 404, error code
-   `SOURCE_NOT_FOUND`. *(FR-026)*
+   `SOURCE_NOT_FOUND`. *(FR-011)*
 
 5. **Given** a source file containing duplicate activity IDs,
    **When** POST `/api/insights`, **Then** HTTP 422, error code
-   `INVALID_SOURCE_CONTENT`. *(FR-005, FR-027)*
+   `INVALID_SOURCE_CONTENT`. *(FR-002, FR-011)*
 
 6. **Given** a source file with 201 activity objects, **When** POST
    `/api/insights`, **Then** HTTP 422, error code
-   `INVALID_SOURCE_CONTENT`. *(FR-004)*
+   `INVALID_SOURCE_CONTENT`. *(FR-003)*
 
 7. **Given** a question exceeding 300 characters, **When** POST
    `/api/insights`, **Then** HTTP 400, error code
-   `INVALID_QUESTION`. *(FR-006, FR-025)*
+   `INVALID_QUESTION`. *(FR-001, FR-011)*
 
 8. **Given** a source file where an activity has a negative distance,
    **When** POST `/api/insights`, **Then** HTTP 422, error code
-   `INVALID_SOURCE_CONTENT`. *(FR-004)*
+   `INVALID_SOURCE_CONTENT`. *(FR-003)*
 
 9. **Given** a source file where an activity is missing `sport_type`,
    **When** POST `/api/insights`, **Then** HTTP 422, error code
-   `INVALID_SOURCE_CONTENT`. *(FR-004)*
+   `INVALID_SOURCE_CONTENT`. *(FR-003)*
 
 10. **Given** a POST request with no `source` field, **When** POST
     `/api/insights`, **Then** HTTP 400, error code
@@ -209,25 +209,25 @@ distinct error code.
 
 1. **Given** the model provider returns an error, **When** POST
    `/api/insights` with valid input, **Then** HTTP 502, error code
-   `MODEL_ERROR`. *(FR-028)*
+   `MODEL_ERROR`. *(FR-011)*
 
 2. **Given** the model provider times out, **When** POST
    `/api/insights` with valid input, **Then** HTTP 504, error code
-   `MODEL_TIMEOUT`. *(FR-029)*
+   `MODEL_TIMEOUT`. *(FR-011)*
 
 3. **Given** the model returns unparseable output on both the initial
    call and one retry, **When** POST `/api/insights` with valid
    input, **Then** HTTP 502, error code `MODEL_OUTPUT_INVALID`.
-   *(FR-019, FR-030)*
+   *(FR-009, FR-011)*
 
 4. **Given** the model returns unparseable output on the first call
    but valid output on the retry, **When** POST `/api/insights`,
    **Then** HTTP 200, status is `OK`, response is normal.
-   *(FR-019)*
+   *(FR-009)*
 
 5. **Given** any error response, **When** the error body is
    inspected, **Then** it contains `code` and `message` fields but
-   never the API key or raw file contents. *(FR-031)*
+   never the API key or raw file contents. *(FR-011)*
 
 ---
 
@@ -246,11 +246,11 @@ environment variable and verify it exits with an error.
 
 1. **Given** the model API key environment variable is not set,
    **When** the service starts, **Then** it refuses to start with a
-   clear error message naming the missing configuration. *(FR-032)*
+   clear error message naming the missing configuration. *(FR-012)*
 
 2. **Given** the source folder configuration is not set, **When**
    the service starts, **Then** it refuses to start with a clear
-   error message naming the missing configuration. *(FR-033)*
+   error message naming the missing configuration. *(FR-012)*
 
 ---
 
@@ -359,97 +359,85 @@ to one decimal place.
 
 ### Functional Requirements
 
-- **FR-001**: The service MUST accept a POST request at `/api/insights`
-  with a JSON body containing `source` (required string) and `question`
-  (optional string).
-- **FR-002**: The service MUST reject source names that contain a path
-  separator (`/` or `\`), a parent-directory sequence (`..`), do not
-  end in `.json`, or are empty.
-- **FR-003**: The service MUST resolve the source file name against one
-  configured base directory only; no absolute paths or subdirectory
-  traversal.
-- **FR-004**: The service MUST validate that the source file contains a
-  JSON array of at most 200 objects, each with the required fields and
-  types defined in the input contract.
-- **FR-005**: The service MUST reject a source file with duplicate
-  activity IDs.
-- **FR-006**: The service MUST reject a question exceeding 300
-  characters.
-- **FR-007**: The service MUST strip all fields outside the allow-list
+- **FR-001**: The service MUST accept `POST /api/insights` with a
+  JSON body containing `source` (string, required) and `question`
+  (string, optional, max 300 characters). An absent or empty source
+  returns INVALID_SOURCE_NAME (400); a question exceeding 300
+  characters returns INVALID_QUESTION (400).
+  *(consolidates former FR-001, FR-006)*
+
+- **FR-002**: The service MUST validate source names: must match
+  `^[A-Za-z0-9._-]{1,100}\.json$`, must not contain `..`, is
+  resolved against one configured base directory only (no absolute
+  paths or subdirectory traversal), and the file MUST NOT contain
+  duplicate activity IDs.
+  *(consolidates former FR-002, FR-003, FR-005)*
+
+- **FR-003**: The service MUST validate that the source file is a
+  JSON array of at most 200 activity objects, each conforming to the
+  input contract (required fields, correct types, non-negative
+  numeric values). Any violation returns INVALID_SOURCE_CONTENT (422).
+  *(consolidates former FR-004)*
+
+- **FR-004**: The service MUST strip all fields outside the allow-list
   (id, sport_type, distance, moving_time, start_date, name) before
-  any further processing.
-- **FR-008**: The service MUST never send location data (start/end
-  coordinates, map polylines) to the model, log it, or include it in
-  any response.
-- **FR-009**: The service MUST compute all statistics (total distance,
-  total moving time, longest activity, dominant sport, activity count)
-  deterministically, expressing distances in kilometres and times in
-  minutes, rounded to one decimal place.
-- **FR-010**: When a schema-valid file contains fewer than 3 activity
-  objects, the service MUST return status `INSUFFICIENT_DATA` with an
-  empty insights array and MUST NOT call the model. (A file with any
-  schema-invalid activity is rejected as INVALID_SOURCE_CONTENT before
-  this check.)
-- **FR-011**: The service MUST refuse questions requesting medical
-  diagnosis, treatment, injury assessment, or health advice by
-  returning status `REFUSED` with an empty insights array.
-- **FR-012**: The service MUST refuse questions requesting data
-  modification (create, update, delete, write) by returning status
-  `REFUSED`.
-- **FR-013**: The service MUST refuse questions about other athletes'
-  data by returning status `REFUSED`.
-- **FR-014**: The service MUST refuse questions unrelated to the five
-  supported metrics by returning status `REFUSED`.
-- **FR-015**: When no question is provided or the question is vague,
-  the service MUST produce a general overview with status `OK` and
-  exactly 5 insights, one per metric.
-- **FR-016**: The service MUST call the language model only to produce
-  interpretive wording from pre-computed facts, and only when the
-  response status will be `OK`.
-- **FR-017**: The service MUST pass untrusted data (activity names,
-  user question) to the model as clearly delimited data sections,
-  ensuring instructions embedded in data are never followed.
-- **FR-018**: The service MUST parse and validate model output against
-  the output contract before including it in the response.
-- **FR-019**: If model output fails validation, the service MUST retry
-  once. If the retry also fails validation, the service MUST return
-  error code `MODEL_OUTPUT_INVALID`.
-- **FR-020**: Every successful response MUST include `status`,
-  `summary`, `insights`, and `metadata` (with `activities_analysed`
-  and `source`) matching the output contract.
-- **FR-021**: When status is `OK`, insights MUST contain 1-5 items
-  with each metric used at most once.
-- **FR-022**: Each insight MUST have `metric`, `text`, `confidence`,
-  `evidence_activity_ids`, `value`, and `unit` with types and bounds
-  as defined in the output contract. `confidence` is model-discretionary
-  (LOW, MEDIUM, or HIGH); only structural validation applies.
-- **FR-023**: All distances in insights MUST be in kilometres and all
-  times in minutes, rounded to one decimal place.
-- **FR-024**: The service MUST return HTTP 400 with error code
-  `INVALID_SOURCE_NAME` for invalid source names.
-- **FR-025**: The service MUST return HTTP 400 with error code
-  `INVALID_QUESTION` for invalid questions.
-- **FR-026**: The service MUST return HTTP 404 with error code
-  `SOURCE_NOT_FOUND` when the source file does not exist in the base
-  directory.
-- **FR-027**: The service MUST return HTTP 422 with error code
-  `INVALID_SOURCE_CONTENT` for files that are not valid JSON arrays
-  or contain activities with missing/invalid required fields.
-- **FR-028**: The service MUST return HTTP 502 with error code
-  `MODEL_ERROR` for model provider failures (rate limits, server
-  errors).
-- **FR-029**: The service MUST return HTTP 504 with error code
-  `MODEL_TIMEOUT` for model provider timeouts.
-- **FR-030**: The service MUST return HTTP 502 with error code
-  `MODEL_OUTPUT_INVALID` when model output remains invalid after one
-  retry.
-- **FR-031**: Error responses MUST contain `code` and `message`
-  fields and MUST never include the API key, raw file contents, or
-  internal prompt text.
-- **FR-032**: The service MUST refuse to start with a clear error
-  message if the model API key environment variable is missing.
-- **FR-033**: The service MUST refuse to start with a clear error
-  message if the source folder configuration is missing.
+  any processing. Location data (coordinates, map polylines) MUST
+  never be sent to the model, logged, or returned.
+  *(consolidates former FR-007, FR-008)*
+
+- **FR-005**: The service MUST deterministically compute: activity
+  count, total distance (km, 1dp), total moving time (min, 1dp),
+  longest activity by distance (km, 1dp), and dominant sport by
+  activity count.
+  *(consolidates former FR-009, FR-023)*
+
+- **FR-006**: When a schema-valid file contains fewer than 3 activity
+  objects, the service MUST return status `INSUFFICIENT_DATA` with
+  empty insights and MUST NOT call the model.
+  *(consolidates former FR-010)*
+
+- **FR-007**: The service MUST return status `REFUSED` with empty
+  insights for questions requesting medical diagnosis or health
+  advice, data modification, information about other athletes, or
+  topics unrelated to the five supported metrics.
+  *(consolidates former FR-011, FR-012, FR-013, FR-014)*
+
+- **FR-008**: When the question is absent or vague, the service MUST
+  return status `OK` with exactly 5 insights, one per metric.
+  *(consolidates former FR-015)*
+
+- **FR-009**: The service MUST use the model only to produce
+  interpretive wording from pre-computed facts, passing untrusted
+  data (activity names, question) in clearly delimited blocks. Model
+  output MUST be validated before returning; on failure the service
+  retries once, then returns MODEL_OUTPUT_INVALID (502).
+  *(consolidates former FR-016, FR-017, FR-018, FR-019)*
+
+- **FR-010**: Every HTTP 200 response MUST include `status`,
+  `summary` (1–400 chars), `insights`, and `metadata`
+  (`activities_analysed`, `source`). Each insight MUST include
+  `metric`, `text` (1–300 chars), `confidence` (LOW/MEDIUM/HIGH,
+  model-discretionary), `evidence_activity_ids` (non-empty, all IDs
+  from input), `value`, and `unit` per the output contract table.
+  When status is `OK`, insights has 1–5 items with each metric used
+  at most once.
+  *(consolidates former FR-020, FR-021, FR-022)*
+
+- **FR-011**: Error responses MUST use the following codes and HTTP
+  statuses: INVALID_SOURCE_NAME (400), INVALID_QUESTION (400),
+  SOURCE_NOT_FOUND (404), INVALID_SOURCE_CONTENT (422), MODEL_ERROR
+  (502), MODEL_TIMEOUT (504), MODEL_OUTPUT_INVALID (502). All error
+  bodies MUST contain `code` and `message` and MUST never include
+  the API key, file contents, or prompt text. MODEL_ERROR and
+  MODEL_TIMEOUT are service failures; MODEL_OUTPUT_INVALID is an
+  application failure.
+  *(consolidates former FR-024, FR-025, FR-026, FR-027, FR-028,
+  FR-029, FR-030, FR-031)*
+
+- **FR-012**: The service MUST refuse to start with a clear error
+  message if the model API key or source directory configuration is
+  absent.
+  *(consolidates former FR-032, FR-033)*
 
 ### Key Entities
 
@@ -508,15 +496,15 @@ All error responses return JSON with a machine-readable `code` and
 human-readable `message`. Error bodies MUST never include the API key
 or raw file contents.
 
-| Error Code               | HTTP Status | Category          | Trigger                                         |
-| ------------------------ | ----------- | ----------------- | ----------------------------------------------- |
-| `INVALID_SOURCE_NAME`    | 400         | Client error      | Source name fails validation (FR-002)            |
-| `INVALID_QUESTION`       | 400         | Client error      | Question exceeds 300 characters (FR-006)         |
-| `SOURCE_NOT_FOUND`       | 404         | Client error      | File not found in base directory (FR-026)        |
-| `INVALID_SOURCE_CONTENT` | 422         | Client error      | File is not a valid activity array (FR-027)      |
-| `MODEL_ERROR`            | 502         | Service failure   | Model provider failure (FR-028)                  |
-| `MODEL_TIMEOUT`          | 504         | Service failure   | Model provider timeout (FR-029)                  |
-| `MODEL_OUTPUT_INVALID`   | 502         | Application failure | Model output invalid after one retry (FR-030)  |
+| Error Code               | HTTP Status | Category            | Trigger                                       |
+| ------------------------ | ----------- | ------------------- | --------------------------------------------- |
+| `INVALID_SOURCE_NAME`    | 400         | Client error        | Source name fails validation (FR-002)         |
+| `INVALID_QUESTION`       | 400         | Client error        | Question exceeds 300 characters (FR-001)      |
+| `SOURCE_NOT_FOUND`       | 404         | Client error        | File not found in base directory (FR-011)     |
+| `INVALID_SOURCE_CONTENT` | 422         | Client error        | File is not a valid activity array (FR-003)   |
+| `MODEL_ERROR`            | 502         | Service failure     | Model provider failure (FR-011)               |
+| `MODEL_TIMEOUT`          | 504         | Service failure     | Model provider timeout (FR-011)               |
+| `MODEL_OUTPUT_INVALID`   | 502         | Application failure | Model output invalid after one retry (FR-009) |
 
 `MODEL_ERROR` and `MODEL_TIMEOUT` are service failures (external
 dependency). `MODEL_OUTPUT_INVALID` is an application failure (the
