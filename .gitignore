@@ -40,3 +40,11 @@ Thumbs.db
 # Environment / Secrets
 .env
 .env.*
+
+# Live data and evaluation evidence — never committed (Constitution VI, X)
+data/
+evidence/
+
+# Harness Node dependencies
+.harness/node_modules/
+.harness/package-lock.json
