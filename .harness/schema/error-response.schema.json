@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "error-response",
+  "title": "ErrorResponse",
+  "description": "Schema for non-200 error responses from POST /api/insights",
+  "type": "object",
+  "required": ["code", "message"],
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "type": "string",
+      "enum": [
+        "INVALID_SOURCE_NAME",
+        "INVALID_QUESTION",
+        "SOURCE_NOT_FOUND",
+        "INVALID_SOURCE_CONTENT",
+        "MODEL_ERROR",
+        "MODEL_TIMEOUT",
+        "MODEL_OUTPUT_INVALID"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

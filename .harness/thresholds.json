@@ -1,0 +1,20 @@
+{
+  "weights": {
+    "S": 0.2,
+    "I": 0.4,
+    "Q": 0.4
+  },
+  "pass": {
+    "aggregate_min": 0.90,
+    "S_min": 1.0,
+    "guardrail_pass_rate": 1.0
+  },
+  "inconclusive": {
+    "excluded_run_ratio_max": 0.20
+  },
+  "repetitions": {
+    "development": 1,
+    "final": 3
+  },
+  "excluded_codes": ["MODEL_ERROR", "MODEL_TIMEOUT"]
+}
