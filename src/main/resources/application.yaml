@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: athlenz-strava-agent
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    deserialization:
+      fail-on-unknown-properties: false
+    mapper:
+      allow-coercion-of-scalars: true
+  ai:
+    bedrock:
+      aws:
+        region: ${AWS_REGION:}
+        timeout: 30s
+      converse:
+        chat:
+          model: ${BEDROCK_MODEL_ID:}
+          temperature: 0.2
+          max-tokens: 2000
+
+insights:
+  source-dir: ${INSIGHTS_SOURCE_DIR:./data}
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %highlight(%-5level) [%X{reqId:--}] %-40logger{40} : %msg%n"
+  level:
+    in.mycodethesaurus: INFO
+    org.springframework.ai: WARN
