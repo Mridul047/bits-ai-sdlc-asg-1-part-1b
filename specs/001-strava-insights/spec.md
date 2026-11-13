@@ -276,6 +276,18 @@ environment variable and verify it exits with an error.
 
 ## Clarifications
 
+### Session 2026-11-13 (Revision — empty array handling)
+
+- Change: resolved the contradiction between FR-003 ("array of 1–200")
+  and User Story 3 acceptance scenario 2 ("0 activities → INSUFFICIENT_DATA").
+  FR-003 now accepts an array of **0 to 200** activities; an empty array
+  is schema-valid and is handled by FR-006 as `INSUFFICIENT_DATA` (HTTP
+  200), consistent with US3 AS2 and dataset case TC-006. INVALID_SOURCE_CONTENT
+  (422) is reserved for arrays larger than 200, non-array content, and
+  activities that violate the input contract (malformed, duplicate ids,
+  missing fields, negative distance). Recorded under Constitution XIII
+  (Change Control) before the corresponding code change.
+
 ### Session 2026-11-10
 
 - Q: When an activity object fails schema validation, should the
@@ -307,7 +319,8 @@ The service accepts a single HTTP endpoint:
     most 300 characters.
 
 The source file MUST contain a JSON array of at most 200 activity
-objects. Each activity object MUST have:
+objects (an empty array is permitted and yields INSUFFICIENT_DATA; see
+FR-006). Each activity object MUST have:
 
 | Field         | Type            | Constraint                    |
 | ------------- | --------------- | ----------------------------- |
@@ -374,10 +387,15 @@ to one decimal place.
   *(consolidates former FR-002, FR-003, FR-005)*
 
 - **FR-003**: The service MUST validate that the source file is a
-  JSON array of at most 200 activity objects, each conforming to the
+  JSON array of 0 to 200 activity objects, each conforming to the
   input contract (required fields, correct types, non-negative
-  numeric values). Any violation returns INVALID_SOURCE_CONTENT (422).
-  *(consolidates former FR-004)*
+  numeric values). An array larger than 200, or any present activity
+  that violates the input contract, returns INVALID_SOURCE_CONTENT
+  (422). An empty array (0 activities) is schema-valid: it is not an
+  INVALID_SOURCE_CONTENT error but is handled by FR-006, which returns
+  status `INSUFFICIENT_DATA` for any schema-valid file with fewer than
+  3 activities (including 0).
+  *(consolidates former FR-004; see revision 2026-11-13)*
 
 - **FR-004**: The service MUST strip all fields outside the allow-list
   (id, sport_type, distance, moving_time, start_date, name) before

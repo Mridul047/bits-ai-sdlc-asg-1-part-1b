@@ -64,9 +64,12 @@ public class FileActivitySource {
                     "Source file is not a valid JSON array of activities");
         }
 
-        if (activities.isEmpty() || activities.size() > MAX_ACTIVITIES) {
+        // An empty array (0 activities) is schema-valid; it flows through as
+        // INSUFFICIENT_DATA like the <3 case (spec FR-006, US3 AS2). Only >200
+        // remains INVALID_SOURCE_CONTENT.
+        if (activities.size() > MAX_ACTIVITIES) {
             throw new InsightsException(ErrorCode.INVALID_SOURCE_CONTENT,
-                    "Source file must contain 1 to " + MAX_ACTIVITIES + " activities, found " + activities.size());
+                    "Source file must contain at most " + MAX_ACTIVITIES + " activities, found " + activities.size());
         }
 
         validateActivities(activities);

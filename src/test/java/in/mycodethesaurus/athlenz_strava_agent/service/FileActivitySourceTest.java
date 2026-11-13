@@ -148,13 +148,13 @@ class FileActivitySourceTest {
     }
 
     @Test
-    @Tag("FR-003")
-    void rejectsEmptyArray() throws IOException {
+    @Tag("FR-006")
+    void emptyArrayLoadsAsEmptyList() throws IOException {
+        // An empty array is schema-valid and must not be rejected. The service
+        // turns 0 activities into INSUFFICIENT_DATA (spec FR-006, US3 AS2).
         writeFile("empty.json", "[]");
-        assertThatThrownBy(() -> source.load("empty.json"))
-                .isInstanceOf(InsightsException.class)
-                .satisfies(ex -> assertThat(((InsightsException) ex).getErrorCode())
-                        .isEqualTo(ErrorCode.INVALID_SOURCE_CONTENT));
+        List<Activity> activities = source.load("empty.json");
+        assertThat(activities).isEmpty();
     }
 
     @Test

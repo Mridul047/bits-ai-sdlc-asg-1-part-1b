@@ -103,6 +103,32 @@ class InsightsModelClientPrivacyTest {
     }
 
     @Test
+    @Tag("INV-005")
+    void systemPromptForbidsDatesAndDerivedNumbers() {
+        ComputedFacts facts = new ComputedFacts(3, 22.0, 95.0, 10.0, "3", "Run",
+                List.of("1", "2"), List.of("1", "2", "3"));
+
+        List<SanitizedActivity> activities = List.of(
+                new SanitizedActivity("1", "Run", "Run", 5000.0, 1500L, "2024-01-01T07:00:00Z"),
+                new SanitizedActivity("2", "Run B", "Run", 7000.0, 1800L, "2024-01-02T18:00:00Z"),
+                new SanitizedActivity("3", "Ride", "Ride", 10000.0, 2400L, "2024-01-03T08:00:00Z")
+        );
+
+        modelClient.call(facts, activities, "How did I do?");
+
+        String systemContent = capturingModel.getCapturedPrompt().getInstructions().stream()
+                .filter(msg -> msg instanceof org.springframework.ai.chat.messages.SystemMessage)
+                .map(msg -> msg.getText())
+                .collect(Collectors.joining("\n"))
+                .toLowerCase();
+
+        // The prompt must instruct the model not to write dates or derived numbers
+        // in insight text (keeps INV-005 satisfied without changing the evaluator).
+        assertThat(systemContent).contains("calendar date");
+        assertThat(systemContent).contains("derived");
+    }
+
+    @Test
     void promptContainsUnstrustedDataDelimiters() {
         ComputedFacts facts = new ComputedFacts(3, 22.0, 95.0, 10.0, "3", "Run",
                 List.of("1", "2"), List.of("1", "2", "3"));

@@ -98,6 +98,23 @@ class InsightsServiceTest {
 
     @Test
     @Tag("FR-006")
+    void insufficientDataReturnedForEmptyActivityArray() {
+        when(fileActivitySource.load(SOURCE)).thenReturn(Collections.emptyList());
+        when(activitySanitizer.sanitize(any())).thenReturn(Collections.emptyList());
+        when(factsCalculator.compute(any()))
+                .thenReturn(new ComputedFacts(0, 0.0, 0.0, 0.0, null, null,
+                        Collections.emptyList(), Collections.emptyList()));
+
+        InsightsResponse response = insightsService.generateInsights(new InsightsRequest(SOURCE, null));
+
+        assertThat(response.status()).isEqualTo("INSUFFICIENT_DATA");
+        assertThat(response.insights()).isEmpty();
+        assertThat(response.metadata().activitiesAnalysed()).isZero();
+        verify(modelClient, never()).call(any(), any(), any());
+    }
+
+    @Test
+    @Tag("FR-006")
     void modelNotCalledWhenInsufficientData() {
         when(fileActivitySource.load(SOURCE)).thenReturn(List.of(
                 new Activity("1", "Run", "Run", 5000.0, 1500L, "2024-01-01T07:00:00Z")

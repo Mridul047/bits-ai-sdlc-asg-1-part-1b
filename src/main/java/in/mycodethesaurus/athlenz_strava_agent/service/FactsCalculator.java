@@ -18,6 +18,14 @@ public class FactsCalculator {
     public ComputedFacts compute(List<SanitizedActivity> activities) {
         int count = activities.size();
 
+        // An empty activity set has no longest activity or dominant sport.
+        // Return zeroed facts so the service can short-circuit to INSUFFICIENT_DATA
+        // (spec FR-006, US3 AS2) instead of failing on an empty stream.
+        if (count == 0) {
+            return new ComputedFacts(0, 0.0, 0.0, 0.0, null, null,
+                    List.of(), List.of());
+        }
+
         double totalDistanceM = activities.stream()
                 .mapToDouble(SanitizedActivity::distance)
                 .sum();

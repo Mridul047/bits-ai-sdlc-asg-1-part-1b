@@ -110,4 +110,21 @@ class FactsCalculatorTest {
         ComputedFacts facts = calculator.compute(fiveActivities());
         assertThat(facts.allActivityIds()).containsExactlyInAnyOrder("1", "2", "3", "4", "5");
     }
+
+    @Test
+    @Tag("FR-006")
+    void emptyActivityListYieldsZeroedFacts() {
+        // An empty array must not crash: it yields zeroed facts with no longest
+        // activity or dominant sport, letting the service return INSUFFICIENT_DATA
+        // (spec FR-006, US3 AS2).
+        ComputedFacts facts = calculator.compute(List.of());
+        assertThat(facts.activityCount()).isZero();
+        assertThat(facts.totalDistanceKm()).isZero();
+        assertThat(facts.totalMovingTimeMin()).isZero();
+        assertThat(facts.longestActivityDistanceKm()).isZero();
+        assertThat(facts.longestActivityId()).isNull();
+        assertThat(facts.dominantSport()).isNull();
+        assertThat(facts.dominantSportActivityIds()).isEmpty();
+        assertThat(facts.allActivityIds()).isEmpty();
+    }
 }
