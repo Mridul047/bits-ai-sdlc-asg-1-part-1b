@@ -1,5 +1,6 @@
 .idea/
 .claude/
+.agents/
 
 # Machine-local Spec Kit state — not meant to be shared.
 # Managed by the Specify CLI; safe to edit (your changes are preserved on refresh).
@@ -37,14 +38,10 @@ Thumbs.db
 *.iws
 *.ipr
 
-# Environment / Secrets
+# Environment / Secrets — keep the example template, ignore everything else
 .env
 .env.*
-
-# Live data and evaluation evidence — never committed (Constitution VI, X)
-data/
-evidence/
+!.env.example
 
 # Harness Node dependencies
 .harness/node_modules/
-.harness/package-lock.json
