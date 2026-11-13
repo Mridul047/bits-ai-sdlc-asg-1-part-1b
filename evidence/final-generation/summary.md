@@ -103,4 +103,4 @@ Final-mode results match the dev-mode repaired run exactly and show no cross-rep
 
 ## Residual risks
 - Model wording can vary between runs; this final-mode run shows no variance in layer outcomes or semantic scores, but results come from a single model and region.
-- Human ACCEPT/REJECT is still **PENDING** (recorded in `harness-log.md` section 6).
+- Human decision: **ACCEPT** (2026-11-13), recorded in `harness-log.md` section 6, with the known limitations above.

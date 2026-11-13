@@ -7,7 +7,7 @@ Raw evidence (this is the single harness log; other evidence folders hold only r
 - Evaluation 3 (final mode, final results): `evidence/final-generation/eval-results.json` and `summary.md`; identical to the latest `evidence/eval-results.json`
 Log structure follows course guideline section 4.10 (sections 1 to 6).
 
-Status of this log: **Evaluation 1 (initial generation), Evaluation 2 (after repair, development mode) and Evaluation 3 (final mode, 3 repetitions) recorded. Repairs applied and re-evaluated to PASS in both development and final mode. No further repair was made after Evaluation 2. Final human decision is pending.**
+Status of this log: **Evaluation 1 (initial generation), Evaluation 2 (after repair, development mode) and Evaluation 3 (final mode, 3 repetitions) recorded. Repairs applied and re-evaluated to PASS in both development and final mode. No further repair was made after Evaluation 2. Final human decision: ACCEPT.**
 
 ---
 
@@ -233,7 +233,9 @@ Repairs were applied to application code, the system prompt and the specificatio
 
 ## 6. Final human decision, known limitations and residual risks
 
-**Final decision: PENDING (ACCEPT / REJECT to be recorded by the human reviewer).** Evaluation 2 is an automated PASS in development mode and Evaluation 3 is an automated PASS in final mode (3 repetitions, invariants and guardrails held on every repetition); the human ACCEPT/REJECT follows.
+**Final decision: ACCEPT** (human reviewer, 2026-11-13).
+
+Basis: Evaluation 2 is an automated PASS in development mode and Evaluation 3 is an automated PASS in final mode (3 repetitions, aggregate 0.983, invariants and guardrails held on every repetition). The reviewer also tested the running application manually, found it working, and accepted it with the known limitations and residual risks listed below.
 
 Known limitations after repair:
 - The recommended final-mode run (3 repetitions, `node .harness/runner.mjs --mode final`) has now been completed as Evaluation 3: PASS with no cross-repetition variance. Results still come from a single model and region.
