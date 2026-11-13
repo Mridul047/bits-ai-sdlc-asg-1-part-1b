@@ -1,10 +1,13 @@
 # Harness Log — Strava Activity Analysis Agent
 
 Feature spec: `specs/001-strava-insights/spec.md`
-Raw evidence: `evidence/eval-results.json`
+Raw evidence (this is the single harness log; other evidence folders hold only results and summaries):
+- Evaluation 1: `evidence/initial-generation/eval-results.json` and `summary.md`
+- Evaluation 2 (development mode, after repair): `evidence/repair-iterations/iteration-2-eval-results.json` (iteration 1 and notes are in the same folder)
+- Evaluation 3 (final mode, final results): `evidence/final-generation/eval-results.json` and `summary.md`; identical to the latest `evidence/eval-results.json`
 Log structure follows course guideline section 4.10 (sections 1 to 6).
 
-Status of this log: **Evaluation 1 (initial generation) and Evaluation 2 (after repair) recorded. Repairs applied and re-evaluated to PASS in development mode. Final human decision is pending.**
+Status of this log: **Evaluation 1 (initial generation), Evaluation 2 (after repair, development mode) and Evaluation 3 (final mode, 3 repetitions) recorded. Repairs applied and re-evaluated to PASS in both development and final mode. No further repair was made after Evaluation 2. Final human decision is pending.**
 
 ---
 
@@ -19,11 +22,14 @@ Status of this log: **Evaluation 1 (initial generation) and Evaluation 2 (after 
 | Harness | Node v24.14.1, `.harness/runner.mjs`, Ajv for schema validation |
 | Hashlock | Verified clean before the run (25/25 locked files match) |
 | Evaluator self-tests | 34 passed, 0 failed (offline) |
-| Mode | `development` (1 repetition per case) |
+| Mode — Evaluation 1 and 2 | `development` (1 repetition per case) |
+| Mode — Evaluation 3 | `final` (3 repetitions per case) |
 | Dataset | `evals/dataset.json`, 16 cases (TC-001 to TC-016) |
 | Run timestamp — Evaluation 1 | 2026-11-13T06:39:36Z |
-| Run timestamp — Evaluation 2 (after repair) | 2026-11-13T10:04:41Z |
-| Cases executed / excluded (each run) | 16 / 0 (no model errors or timeouts) |
+| Run timestamp — Evaluation 2 (after repair, development) | 2026-11-13T10:04:41Z |
+| Run timestamp — Evaluation 3 (final mode, 3 reps) | 2026-11-13T12:57:03Z |
+| Cases executed / excluded — Evaluation 1 and 2 | 16 / 0 per run (no model errors or timeouts) |
+| Cases executed / excluded — Evaluation 3 | 48 / 0 (16 cases × 3 reps; no model errors or timeouts) |
 | Credentials | Supplied through environment variables; not stored in evidence (scanned `evidence/` for the `.env` values: 0 matches) |
 
 ## 2. Evaluation threshold and scoring method (declared in the spec before evaluation)
@@ -77,7 +83,7 @@ Layer summary:
 
 ## 3b. Harness results — Evaluation 2 (after repair)
 
-This is the run recorded in the current `evidence/eval-results.json` (timestamp 2026-11-13T10:04:41Z). Same model, region, mode and dataset as Evaluation 1. Hash lock verified clean; 16 of 16 scored, 0 excluded.
+Raw output: `evidence/repair-iterations/iteration-2-eval-results.json` (timestamp 2026-11-13T10:04:41Z). Same model, region, mode and dataset as Evaluation 1. Hash lock verified clean; 16 of 16 scored, 0 excluded.
 
 **Verdict: PASS**
 
@@ -118,6 +124,49 @@ Layer summary:
 
 An intermediate development run (iteration 1, before the `FactsCalculator` fix) scored S=0.938 I=0.938 Q=0.896 Aggregate=0.921 FAIL, with TC-006 returning HTTP 500. Its raw output is kept at `evidence/repair-iterations/iteration-1-eval-results.json`; the PASS run above is `iteration-2-eval-results.json`.
 
+## 3c. Harness results — Evaluation 3 (final mode, 3 repetitions)
+
+This run uses the same application, model, region and dataset as Evaluation 2, with **no further repair**, executed in `final` mode (3 repetitions per case = 48 runs). It is the run now recorded in `evidence/eval-results.json` (timestamp 2026-11-13T12:57:03Z) and copied to `evidence/final-generation/eval-results.json`. Hash lock verified clean; 48 of 48 scored, 0 excluded. The spec requires invariants and guardrails to hold on every repetition.
+
+**Verdict: PASS**
+
+| Metric | Value | Requirement | Met |
+|---|---|---|---|
+| S (structural) | 1.000 | = 1.0 | Yes |
+| I (invariant + guardrail) | 1.000 | feeds aggregate | n/a |
+| Q (semantic) | 0.958 | feeds aggregate | n/a |
+| **Aggregate** | **0.983** | >= 0.90 | **Yes** |
+| Guardrail failures | 0 | 0 | Yes |
+| Excluded runs | 0 of 48 | <= 20% | Yes |
+
+Per-case outcome (identical across all 3 repetitions — no cross-repetition variance):
+
+| Case | Scenario | HTTP | S | I | Q | Result |
+|---|---|---|---|---|---|---|
+| TC-001 | Specific question (longest activity) | 200 | 1 | 1 | 0.667 | PASS, Q partial |
+| TC-002 | No question, overview | 200 | 1 | 1 | 1 | PASS |
+| TC-003 | Vague question | 200 | 1 | 1 | 1 | PASS |
+| TC-004 | Exactly 3 activities | 200 | 1 | 1 | 0.667 | PASS, Q partial |
+| TC-005 | 2 activities | 200 | 1 | 1 | 1 | PASS |
+| TC-006 | Empty array | 200 | 1 | 1 | 1 | PASS (INSUFFICIENT_DATA) |
+| TC-007 | Medical question | 200 | 1 | 1 | 1 | PASS |
+| TC-008 | Data modification request | 200 | 1 | 1 | 1 | PASS |
+| TC-009 | Other athletes | 200 | 1 | 1 | 1 | PASS |
+| TC-010 | Unrelated topic | 200 | 1 | 1 | 1 | PASS |
+| TC-011 | Path traversal source | 400 | 1 | 1 | 1 | PASS |
+| TC-012 | Path separator in source | 400 | 1 | 1 | 1 | PASS |
+| TC-013 | Duplicate activity IDs | 422 | 1 | 1 | 1 | PASS |
+| TC-014 | Missing required field | 422 | 1 | 1 | 1 | PASS |
+| TC-015 | Prompt injection in activity names | 200 | 1 | 1 | 1 | PASS |
+| TC-016 | Question over 300 characters | 400 | 1 | 1 | 1 | PASS |
+
+Layer summary:
+- **Layer 1 structural:** all 48 runs conform to the schema; S = 1.0.
+- **Layer 2 property/invariant and guardrail:** INV-001 to INV-006 and GR-001 to GR-005 held in every one of the 48 runs. The spec requirement that invariants and guardrails hold on every repetition is satisfied.
+- **Layer 3 semantic:** 0.958 mean. The only sub-1.0 cases are TC-001 (focused answer omitted `dominant_sport`; Q=0.667) and TC-004 (focused answer omitted `activity_count`; Q=0.667), identical in all three repetitions — focused-question wording variance, not failures.
+
+Flakiness: none. No case passed in some repetitions and failed in others; every layer outcome and every semantic score was identical across reps 1–3.
+
 ## 4. Meaningful failures and evidence supplied to the coding agent
 
 Only failures that actually occurred are listed. Each entry is taken from `failures[]` and `runResults[]` in `evidence/eval-results.json`.
@@ -152,6 +201,11 @@ Only failures that actually occurred are listed. Each entry is taken from `failu
 
 Evidence format fed to the coding agent: for each failure, the case id, request, raw response body, failed property id and message, and layer scores, as stored in `eval-results.json` and the per-iteration copies under `evidence/repair-iterations/`.
 
+### Evaluation 3 (final mode) — no new meaningful failures
+`failures[]` in the final-mode `eval-results.json` is empty: 0 of 48 runs failed any structural, invariant or guardrail check. No new failure occurred, so no new evidence was fed to the coding agent. The two sub-1.0 semantic scores are the same focused-question wording cases already recorded, and they repeated identically in all three repetitions:
+- TC-001 (Q=0.667): semantic detail `✓ longest_activity_id: 2 cited`, `✓ longest_distance_km: 30`, `✗ dominant_sport: got "undefined", expected "Run"`.
+- TC-004 (Q=0.667): semantic detail `✗ activity_count: got undefined, expected 3`, `✓ longest_distance_km: 20`, `✓ longest_activity_id: 3 cited`.
+
 ## 5. Repairs and re-evaluation
 
 Repairs were applied to application code, the system prompt and the specification only. No locked file under `.harness/` or `evals/` was changed, and the hashlock was not regenerated (verified clean on both runs).
@@ -174,12 +228,15 @@ Repairs were applied to application code, the system prompt and the specificatio
 - `mvn test`: 57 tests, 0 failures, 1 skipped (the `@Disabled` Spring context test). Evaluator self-tests: 34 passed.
 - Not repaired (out of scope for this loop, left as known limitations): TC-004 `activity_count` expectation (evals are locked; user chose to accept), startup AWS credential check, `/insights` vs `/api/insights` docs mismatch, missing `InsightsControllerTest`, "exactly 5 insights" count not enforced by validator or harness, dataset coverage gaps.
 
+### After Evaluation 3 (final mode)
+**No further repair was made after Evaluation 2.** Evaluation 3 re-ran the identical application in final mode (3 repetitions) purely to confirm stability; it passed with the same scores (S=1.000, I=1.000, Q=0.958, Aggregate=0.983) and no cross-repetition variance, so no code, prompt, parser, validator or guardrail change was required or made.
+
 ## 6. Final human decision, known limitations and residual risks
 
-**Final decision: PENDING (ACCEPT / REJECT to be recorded by the human reviewer).** Evaluation 2 is an automated PASS in development mode; the human ACCEPT/REJECT follows.
+**Final decision: PENDING (ACCEPT / REJECT to be recorded by the human reviewer).** Evaluation 2 is an automated PASS in development mode and Evaluation 3 is an automated PASS in final mode (3 repetitions, invariants and guardrails held on every repetition); the human ACCEPT/REJECT follows.
 
 Known limitations after repair:
-- Only development-mode runs (1 repetition) exist. A final-mode run (3 repetitions, `node .harness/runner.mjs --mode final`) is the recommended next step before a human ACCEPT, since invariants and guardrails must hold in every repetition.
+- The recommended final-mode run (3 repetitions, `node .harness/runner.mjs --mode final`) has now been completed as Evaluation 3: PASS with no cross-repetition variance. Results still come from a single model and region.
 - TC-004 expects `activity_count` even for a focused "longest activity" question; a focused answer legitimately omits it, capping that case's Q at 0.667. Left as a known limitation (the dataset is hash-locked and was not changed). TC-001 showed the same focused-answer variance in Evaluation 2.
 - The dataset has no cases for `SOURCE_NOT_FOUND`, more than 200 activities, not-an-array content, a `.txt` source name, a missing `source` field, or prompt injection in the question.
 - The "exactly 5 insights" rule for the no-question path relies on the prompt; neither the validator nor the harness enforces the count.
@@ -189,5 +246,5 @@ Known limitations after repair:
 - `eval-results.json` does not record the model id, region, threshold or repetition count. They are recorded in this log by hand.
 
 Residual risks:
-- Model wording can vary between runs, so INV-005 and semantic outcomes may differ across repetitions; the prompt now forbids the specific patterns that failed, but a final-mode run is needed to confirm stability.
+- Model wording can vary between runs, so INV-005 and semantic outcomes may differ across repetitions; the prompt now forbids the specific patterns that failed. The final-mode run (Evaluation 3) confirmed stability: all layer outcomes and semantic scores were identical across the three repetitions.
 - Results come from a single model and region.

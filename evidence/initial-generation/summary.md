@@ -4,7 +4,7 @@ Snapshot of the first end-to-end harness evaluation, taken before any repair.
 
 Files in this folder:
 - `eval-results.json` — raw harness output (copy of `evidence/eval-results.json` from this run)
-- `harness-log.md` — structured log per guideline 4.10 (copy as of this snapshot)
+- Harness log: see the single log at `evidence/harness-log.md` (guideline 4.10)
 - `summary.md` — this file
 
 ## Run details
@@ -32,4 +32,4 @@ Files in this folder:
 | TC-004 | Semantic (partial) | Focused question returned one insight, so `activity_count` was missing. Q = 0.667. Run still passed. |
 
 ## Repairs
-None. This snapshot is the code state before repair. Repairs and the re-run will be documented in `evidence/final-generation/summary.md`.
+None. This snapshot is the code state before repair. Repairs and the final results are documented in `evidence/final-generation/summary.md`.
